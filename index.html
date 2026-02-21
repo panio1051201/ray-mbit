@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">MBTI 人格測驗 - 過年版 | CNY MBTI Quiz</title>
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="MBTI 人格測驗 - 過年版" id="og-title">
+    <meta property="og:description" content="測測你的過年人格！16 個情境問題，發現你是 16 種 MBTI 類型中的哪一種" id="og-description">
+    <meta property="og:image" content="./images/all-types-hero.png" id="og-image">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Amplitude Analytics -->
+    <script src="https://cdn.amplitude.com/libs/analytics-browser-2.11.3-min.js.gz"></script>
+    <script>
+        // Initialize Amplitude Analytics (client-side only)
+        if (typeof window !== 'undefined') {
+            window.amplitude.init('fc8073198febb9e954e8972acf70ee85', {
+                autocapture: {
+                    attribution: true,
+                    fileDownloads: true,
+                    formInteractions: true,
+                    pageViews: true,
+                    sessions: true,
+                    elementInteractions: true
+                }
+            });
+        }
+    </script>
+
+    <!-- Fonts -->
+    <link rel="stylesheet" href="https://font.emtech.cc/css/NotoSansTC">
+    <link rel="stylesheet" href="https://font.emtech.cc/css/jfOpenHuninn">
+
+    <!-- Remix Icon -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: "NotoSansTC", "Microsoft JhengHei", "PingFang TC", system-ui, -apple-system, sans-serif;
+            background-color: #faf8f5;
+            color: #292524;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: "jfOpenHuninn", "NotoSansTC", "Microsoft JhengHei", system-ui, sans-serif;
+        }
+
+        .btn-primary {
+            background-color: #ca8a04;
+            color: #faf8f5;
+        }
+
+        .btn-primary:hover {
+            background-color: #a16207;
+        }
+
+        /* Start screen animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .start-card {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .floating-emoji {
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .start-btn {
+            transition: all 0.3s ease;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(202, 138, 4, 0.3);
+        }
+
+        .start-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .cny-decoration {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        /* Tinder card stack styles */
+        .card-stack {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            height: 450px;
+            margin: 0 auto;
+        }
+
+        @media (max-height: 700px) {
+            .card-stack {
+                height: 380px;
+            }
+        }
+
+        .swipe-card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            cursor: grab;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            user-select: none;
+            touch-action: none;
+            /* 阻止瀏覽器預設的觸控行為（包括捲動） */
+        }
+
+        .swipe-card:active {
+            cursor: grabbing;
+        }
+
+        .swipe-card.swiping {
+            transition: none;
+        }
+
+        .swipe-card.swiped-left {
+            animation: swipeLeft 0.5s ease-out forwards;
+        }
+
+        .swipe-card.swiped-right {
+            animation: swipeRight 0.5s ease-out forwards;
+        }
+
+        @keyframes swipeLeft {
+            to {
+                transform: translateX(-150%) rotate(-30deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes swipeRight {
+            to {
+                transform: translateX(150%) rotate(30deg);
+                opacity: 0;
+            }
+        }
+
+        .swipe-indicator {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .swipe-indicator.left {
+            left: 20px;
+        }
+
+        .swipe-indicator.right {
+            right: 20px;
+        }
+
+        .swipe-indicator.show {
+            opacity: 1;
+        }
+
+        .action-btn {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            border: 3px solid;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        .action-btn.left {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .action-btn.right {
+            border-color: #22c55e;
+            color: #22c55e;
+        }
+
+        .option-label {
+            font-size: 14px;
+            margin-top: 8px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen py-8 px-4">
+    <div x-data="mbtiQuiz()" x-init="init()" class="max-w-3xl mx-auto">
+
+        <!-- 開始畫面 -->
+        <div x-show="screen === 'start'" class="text-center relative">
+            <!-- CNY Decorations -->
+            <div class="cny-decoration" style="top: 10%; left: 5%;">🧧</div>
+            <div class="cny-decoration" style="top: 15%; right: 8%;">🏮</div>
+            <div class="cny-decoration" style="bottom: 20%; left: 10%;">🎆</div>
+            <div class="cny-decoration" style="bottom: 25%; right: 5%;">🎊</div>
+
+            <!-- Main Card -->
+            <div
+                class="start-card bg-white rounded-3xl shadow-2xl p-8 md:p-12 max-w-2xl mx-auto relative overflow-hidden">
+                <!-- Top decoration bar -->
+                <div class="absolute top-0 left-0 right-0 h-2"
+                    style="background: linear-gradient(90deg, #dc2626, #ca8a04, #dc2626);"></div>
+
+                <!-- Floating emojis -->
+                <div class="mb-6 text-5xl">
+                    <span class="floating-emoji" style="animation-delay: 0s;">🧧</span>
+                    <span class="floating-emoji mx-4" style="animation-delay: 0.5s;">🏮</span>
+                    <span class="floating-emoji" style="animation-delay: 1s;">🎆</span>
+                </div>
+
+                <!-- Title -->
+                <h1 class="text-5xl md:text-6xl font-bold mb-3 text-gray-800">
+                    MBTI 人格測驗
+                </h1>
+
+                <!-- Subtitle with golden highlight -->
+                <div class="mb-6">
+                    <p class="text-2xl md:text-3xl font-bold mb-2" style="color: #ca8a04;">
+                        過年版 ✨
+                    </p>
+                    <p class="text-sm md:text-base text-gray-500">
+                        CNY Personality Quiz
+                    </p>
+                </div>
+
+                <!-- Description -->
+                <div class="mb-8 text-gray-600">
+                    <p class="text-lg md:text-xl mb-3 leading-relaxed">
+                        過年期間，你會是什麼樣的人？
+                    </p>
+                    <p class="text-base md:text-lg">
+                        透過 <span class="font-bold" style="color: #ca8a04;">16 個情境問題</span>，<br>
+                        發現你是 <span class="font-bold" style="color: #dc2626;">16 種 MBTI 類型</span>中的哪一種！
+                    </p>
+                </div>
+
+                <!-- Hero Image: 16 角色合照 -->
+                <div class="mb-8">
+                    <img src="./images/all-types-hero.png" alt="16 種過年人格"
+                        class="mx-auto rounded-2xl shadow-lg w-full max-w-2xl">
+                </div>
+
+                <!-- CTA text -->
+                <p class="text-lg font-bold mb-6" style="color: #ca8a04;">
+                    🎊 測測你是哪一種？
+                </p>
+
+                <!-- Start Button -->
+                <button @click="startQuiz()"
+                    class="start-btn btn-primary px-10 py-4 rounded-2xl text-xl md:text-2xl font-bold shadow-lg flex items-center gap-2 mx-auto">
+                    <i class="ri-play-circle-line"></i> 開始測驗
+                </button>
+
+                <!-- Bottom hint -->
+                <p class="text-xs md:text-sm text-gray-400 mt-6">
+                    約需 3-5 分鐘完成
+                </p>
+            </div>
+        </div>
+
+        <!-- 測驗畫面 -->
+        <div x-show="screen === 'quiz'" x-cloak>
+            <!-- 進度條 -->
+            <div class="mb-6">
+                <div class="flex justify-between text-base font-bold mb-2" style="color: #ca8a04;">
+                    <span>問題 <span x-text="currentQuestion + 1"></span> / 16</span>
+                    <span x-text="Math.round(((currentQuestion + 1) / 16) * 100) + '%'"></span>
+                </div>
+                <div class="w-full rounded-full h-5 shadow-inner"
+                    style="background-color: #d1d5db; border: 2px solid #9ca3af;">
+                    <div class="h-full rounded-full transition-all duration-300"
+                        :style="`width: ${((currentQuestion + 1) / 16) * 100}%; background: linear-gradient(135deg, #f59e0b 0%, #ca8a04 50%, #b45309 100%); box-shadow: 0 2px 8px rgba(202, 138, 4, 0.5);`">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 卡片堆疊 -->
+            <div class="card-stack mb-6">
+                <template x-for="(question, index) in questions" :key="index">
+                    <template x-if="index === currentQuestion">
+                        <div :id="'card-' + index" class="swipe-card"
+                            :class="{ 'swiping': swipeState.swiping && index === currentQuestion }" :style="index === currentQuestion && swipeState.swiping ? 
+                                     `transform: translate(${swipeState.deltaX}px, ${swipeState.deltaY}px) rotate(${swipeState.rotation}deg)` : 
+                                     ''" @mousedown="startSwipe($event, index)"
+                            @touchstart="startSwipe($event, index)">
+
+                            <!-- 滑動提示 -->
+                            <div class="swipe-indicator left"
+                                :class="{ 'show': swipeState.deltaX < -50 && index === currentQuestion }">
+                                <svg width="80" height="80" viewBox="0 0 80 80" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M50 20L30 40L50 60" stroke="#ef4444" stroke-width="6"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                            <div class="swipe-indicator right"
+                                :class="{ 'show': swipeState.deltaX > 50 && index === currentQuestion }">
+                                <svg width="80" height="80" viewBox="0 0 80 80" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M30 20L50 40L30 60" stroke="#22c55e" stroke-width="6"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </div>
+
+                            <!-- 卡片內容 -->
+                            <div class="h-full p-4 md:p-6 flex flex-col justify-between">
+                                <div class="flex-1 flex items-center justify-center py-4">
+                                    <h2 class="text-xl md:text-2xl font-bold text-center leading-tight"
+                                        x-text="question.question"></h2>
+                                </div>
+
+                                <!-- 選項顯示 -->
+                                <div class="space-y-2">
+                                    <div
+                                        class="flex items-center text-left p-3 bg-red-50 rounded-lg border-2 border-red-200">
+                                        <span class="font-bold mr-2 text-red-600 text-lg">左</span>
+                                        <span class="text-xs md:text-sm leading-snug" x-text="question.optionA"></span>
+                                    </div>
+                                    <div
+                                        class="flex items-center text-left p-3 bg-green-50 rounded-lg border-2 border-green-200">
+                                        <span class="font-bold mr-2 text-green-600 text-lg">右</span>
+                                        <span class="text-xs md:text-sm leading-snug" x-text="question.optionB"></span>
+                                    </div>
+                                </div>
+                            </div>
+                    </template>
+                </template>
+            </div>
+
+            <!-- 操作按鈕 -->
+            <div class="flex justify-center items-center gap-8 mb-6">
+                <div class="text-center">
+                    <button @click="swipeLeft()" class="action-btn left" :disabled="animating">
+                        <i class="ri-arrow-left-line"></i>
+                    </button>
+                    <div class="option-label text-red-600">選擇左邊</div>
+                </div>
+
+                <div class="text-center">
+                    <button @click="swipeRight()" class="action-btn right" :disabled="animating">
+                        <i class="ri-arrow-right-line"></i>
+                    </button>
+                    <div class="option-label text-green-600">選擇右邊</div>
+                </div>
+            </div>
+
+            <!-- 返回按鈕 -->
+            <div class="text-center">
+                <button @click="prevQuestion()" x-show="currentQuestion > 0 && !animating"
+                    class="px-6 py-2 rounded-lg border-2 text-sm flex items-center gap-2 mx-auto"
+                    style="border-color: #ca8a04; color: #ca8a04;">
+                    <i class="ri-arrow-left-s-line"></i> 返回上一題
+                </button>
+            </div>
+
+            <!-- 操作說明 Overlay（只在第一題顯示） -->
+            <div x-show="currentQuestion === 0 && showTutorial" x-transition
+                class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4"
+                @click="closeTutorial()">
+                <div class="bg-white/95 rounded-3xl p-6 md:p-8 max-w-lg w-full shadow-2xl" @click.stop>
+                    <p class="text-lg font-bold mb-4 text-center" style="color: #ca8a04;">📱 操作方式</p>
+                    <img src="./images/swipe-tutorial.png" alt="滑動操作說明"
+                        class="mx-auto rounded-xl shadow-lg w-full mb-4">
+                    <p class="text-sm text-gray-600 mb-6 text-center">向左或向右滑動卡片，或點擊下方按鈕來選擇答案</p>
+                    <button @click="closeTutorial()"
+                        class="w-full btn-primary py-3 rounded-xl text-lg font-bold flex items-center justify-center gap-2">
+                        <i class="ri-checkbox-circle-line"></i> 知道了！開始測驗
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 結果畫面 -->
+        <div x-show="screen === 'result'" x-cloak class="text-center">
+            <h1 class="text-3xl font-bold mb-2">你的人格是...</h1>
+            <h2 class="text-5xl font-bold mb-6" style="color: #ca8a04;" x-text="result.type"></h2>
+
+            <div class="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-6">
+                <img :src="result.image" :alt="result.type" class="mx-auto mb-6 max-w-md w-full rounded-lg">
+
+                <h3 class="text-2xl font-bold mb-6" x-text="result.title"></h3>
+
+                <div class="text-left space-y-4">
+                    <p class="text-lg leading-relaxed" x-text="result.description"></p>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-4">
+                <button @click="share()"
+                    class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg text-lg font-bold flex items-center justify-center gap-2">
+                    <i class="ri-share-line"></i> 分享結果
+                </button>
+                <button @click="restart()"
+                    class="btn-primary px-8 py-3 rounded-lg text-lg font-bold flex items-center justify-center gap-2">
+                    <i class="ri-restart-line"></i> 我也要測驗！
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-16 pt-8 pb-12 border-t border-gray-300 text-center text-sm text-gray-600">
+            <div class="max-w-3xl mx-auto px-4">
+                <p class="mb-4 text-base font-bold" style="color: #ca8a04;">⚠️ 免責聲明</p>
+                <p class="mb-4">
+                    本測驗為<strong>娛樂性質</strong>，結果僅供參考。<br>
+                    MBTI 人格測驗需要經過<strong>專業培訓的施測者</strong>及標準化量表才能獲得準確結果。<br>
+                    如需專業人格分析，請尋求合格心理諮詢師協助。
+                </p>
+
+                <!-- 聯絡資訊 -->
+                <div class="mt-8 mb-6">
+                    <p class="mb-3 text-base">有任何問題或建議嗎？歡迎與我聯繫！</p>
+                    <div class="flex items-center justify-center gap-4 text-sm">
+                        <a href="https://twitter.com/RayCheng" target="_blank"
+                            class="hover:text-amber-600 transition-colors flex items-center gap-1">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                            </svg>
+                            @RayCheng
+                        </a>
+                        <span class="opacity-50">|</span>
+                        <a href="https://www.facebook.com/cheng.ray" target="_blank"
+                            class="hover:text-amber-600 transition-colors flex items-center gap-1">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                            </svg>
+                            Ray Cheng
+                        </a>
+                    </div>
+                </div>
+
+                <p class="text-xs opacity-75 mt-4">
+                    © 2026 MBTI 人格測驗 - 過年版 by Ray Cheng. All rights reserved.
+                </p>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        function mbtiQuiz() {
+            return {
+                screen: 'start', // start, quiz, result
+                currentQuestion: 0,
+                answers: Array(16).fill(null),
+                result: null,
+                animating: false,
+                showTutorial: false,
+
+                init() {
+                    // 检查 URL 参数和路径
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const resultType = urlParams.get('result');
+
+                    // 也支持路径格式 /result/ESTJ
+                    const pathParts = window.location.pathname.split('/');
+                    const pathResult = pathParts[pathParts.length - 1];
+
+                    const typeToUse = resultType || pathResult;
+
+                    if (typeToUse && typeToUse.length === 4) {
+                        const type = typeToUse.toUpperCase();
+                        if (this.mbtiTypes[type]) {
+                            const typeInfo = this.mbtiTypes[type];
+                            // 直接设置，不要用 $nextTick
+                            this.result = {
+                                type: type,
+                                title: typeInfo.title,
+                                titleEn: typeInfo.titleEn,
+                                description: typeInfo.description,
+                                image: './images/' + type.toLowerCase() + '-share.png'
+                            };
+                            this.screen = 'result';
+                            this.updateMetaTags();
+                        }
+                    }
+                },
+
+                swipeState: {
+                    swiping: false,
+                    startX: 0,
+                    startY: 0,
+                    deltaX: 0,
+                    deltaY: 0,
+                    rotation: 0
+                },
+
+                questions: [
+                    // E/I 維度 (0-3)
+                    {
+                        question: '過年到親戚家，一進門你會...',
+                        optionA: '主動跟每個人打招呼，熱情地聊天',
+                        optionB: '安靜地點頭微笑，等別人來跟你說話',
+                        dimension: 'EI'
+                    },
+                    {
+                        question: '長輩們在客廳聊天時，你通常...',
+                        optionA: '加入話題，分享自己的想法和故事',
+                        optionB: '在旁邊聽，偶爾回應幾句',
+                        dimension: 'EI'
+                    },
+                    {
+                        question: '過年聚會結束後，你的感覺是...',
+                        optionA: '很開心，覺得充滿能量',
+                        optionB: '有點累，需要獨處充電',
+                        dimension: 'EI'
+                    },
+                    {
+                        question: '親戚提議玩桌遊或唱卡拉 OK，你會...',
+                        optionA: '興奮地第一個舉手參加',
+                        optionB: '婉轉推辭，或找個安靜的角落待著',
+                        dimension: 'EI'
+                    },
+
+                    // S/N 維度 (4-7)
+                    {
+                        question: '長輩問你今年的計畫，你會...',
+                        optionA: '說具體的目標：考什麼證照、存多少錢',
+                        optionB: '說大方向：想探索新領域、追求夢想',
+                        dimension: 'SN'
+                    },
+                    {
+                        question: '吃年夜飯時，你注意的是...',
+                        optionA: '菜色的味道、擺盤、誰做的',
+                        optionB: '這頓飯的氛圍、象徵意義、家族傳統',
+                        dimension: 'SN'
+                    },
+                    {
+                        question: '聽親戚說故事時，你會...',
+                        optionA: '關注細節：什麼時候、在哪裡、誰在場',
+                        optionB: '思考背後的意義和可能的發展',
+                        dimension: 'SN'
+                    },
+                    {
+                        question: '收到紅包時，你想到的是...',
+                        optionA: '金額多少、要存起來還是花掉',
+                        optionB: '長輩的心意、這份祝福的意義',
+                        dimension: 'SN'
+                    },
+
+                    // T/F 維度 (8-11)
+                    {
+                        question: '親戚小孩吵架，你會...',
+                        optionA: '分析誰對誰錯，講道理給他們聽',
+                        optionB: '安撫雙方情緒，讓大家和好',
+                        dimension: 'TF'
+                    },
+                    {
+                        question: '長輩抱怨身體不舒服，你會...',
+                        optionA: '建議看醫生、做檢查、調整作息',
+                        optionB: '關心他的感受，陪伴傾聽',
+                        dimension: 'TF'
+                    },
+                    {
+                        question: '做決定時（例如要去哪玩），你傾向...',
+                        optionA: '比較各選項的優缺點，選最合理的',
+                        optionB: '考慮大家的感受，選讓最多人開心的',
+                        dimension: 'TF'
+                    },
+                    {
+                        question: '親戚批評你時，你的反應是...',
+                        optionA: '想：他說的有道理嗎？我該改進嗎？',
+                        optionB: '想：他為什麼這樣說？我是不是做錯了什麼？',
+                        dimension: 'TF'
+                    },
+
+                    // J/P 維度 (12-15)
+                    {
+                        question: '過年拜訪行程，你喜歡...',
+                        optionA: '事先規劃好：幾點到哪家、待多久',
+                        optionB: '隨興安排：看當下心情決定',
+                        dimension: 'JP'
+                    },
+                    {
+                        question: '準備過年禮物時，你會...',
+                        optionA: '早早列清單買好，檢查沒遺漏',
+                        optionB: '接近過年才開始，邊想邊買',
+                        dimension: 'JP'
+                    },
+                    {
+                        question: '親戚提議臨時改行程，你會...',
+                        optionA: '有點不習慣，希望照原計畫',
+                        optionB: '覺得沒關係，反正有彈性',
+                        dimension: 'JP'
+                    },
+                    {
+                        question: '整理過年收到的東西，你會...',
+                        optionA: '當天就分類收好，放到固定位置',
+                        optionB: '先放著，之後有空再慢慢整理',
+                        dimension: 'JP'
+                    }
+                ],
+
+                mbtiTypes: {
+                    'INTJ': {
+                        title: '策略規劃者',
+                        titleEn: 'Strategic Planner',
+                        description: '你是過年聚會的幕後軍師。雖然不愛喧鬧，但總能理性分析親戚關係網絡，規劃最有效率的拜訪路線。你對傳統禮俗有獨到見解，喜歡思考「為什麼要這樣做」。'
+                    },
+                    'INTP': {
+                        title: '好奇觀察者',
+                        titleEn: 'Curious Observer',
+                        description: '你是聚會中的安靜觀察家。對長輩的故事充滿好奇，喜歡分析家族趣事背後的邏輯。雖然不太主動社交，但一旦聊到感興趣的話題，就能滔滔不絕。'
+                    },
+                    'ENTJ': {
+                        title: '家族活動組織者',
+                        titleEn: 'Family Organizer',
+                        description: '你是天生的聚會領導者。擅長協調大家的時間、安排活動流程，確保每個環節順利進行。你的果斷和效率讓長輩們都很放心。'
+                    },
+                    'ENTP': {
+                        title: '辯論發起者',
+                        titleEn: 'Debate Starter',
+                        description: '你是聚會的話題製造機。喜歡拋出新觀點挑戰傳統想法，把飯桌變成辯論場。雖然有時讓長輩傻眼，但總能帶來新鮮的思考角度。'
+                    },
+                    'INFJ': {
+                        title: '安靜諮詢師',
+                        titleEn: 'Quiet Counselor',
+                        description: '你是家族的心靈導師。善於傾聽每個人的心事，給予溫暖的建議。雖然不愛喧鬧，但總能深刻理解每個人的感受，是大家的情緒避風港。'
+                    },
+                    'INFP': {
+                        title: '夢幻故事家',
+                        titleEn: 'Dreamy Storyteller',
+                        description: '你是聚會的浪漫靈魂。對家族故事充滿想像，喜歡從平凡互動中看見深層意義。你可能躲在角落寫詩或畫畫，用獨特視角記錄過年回憶。'
+                    },
+                    'ENFJ': {
+                        title: '和諧主人',
+                        titleEn: 'Harmonious Host',
+                        description: '你是聚會的氛圍製造者。擅長照顧每個人的感受，讓所有人都感到被重視。你的熱情和同理心是家族和諧的關鍵。'
+                    },
+                    'ENFP': {
+                        title: '社交蝴蝶',
+                        titleEn: 'Social Butterfly',
+                        description: '你是過年的快樂泉源！充滿活力和創意，總能讓聚會變得有趣。從小孩到長輩都喜歡你，因為你能讓每個人都開心起來。'
+                    },
+                    'ISTJ': {
+                        title: '傳統守護者',
+                        titleEn: 'Traditional Guardian',
+                        description: '你是家族傳統的守護者。重視禮節、準時、規矩，確保過年習俗一個不漏。你的可靠和認真讓長輩們都很安心。'
+                    },
+                    'ISFJ': {
+                        title: '貼心照顧者',
+                        titleEn: 'Caring Host',
+                        description: '你是最貼心的家族成員。默默記得每個人的喜好，準備貼心的禮物和食物。雖然低調，但你的細心讓每個人都感到溫暖。'
+                    },
+                    'ESTJ': {
+                        title: '高效協調者',
+                        titleEn: 'Efficient Coordinator',
+                        description: '你是聚會的實務執行者。擅長分配工作、掌控時間，確保一切按計畫進行。你的效率和責任感是家族活動的支柱。'
+                    },
+                    'ESFJ': {
+                        title: '關懷連結者',
+                        titleEn: 'Caring Connector',
+                        description: '你是家族的情感中心。熱心照顧每個人，維繫親戚間的關係。你的熱情和關懷讓每個人都感到被愛。'
+                    },
+                    'ISTP': {
+                        title: '問題解決者',
+                        titleEn: 'Problem Solver',
+                        description: '你是聚會的實用幫手。當電器壞了、東西組裝不起來，你總能冷靜搞定。雖然不多話，但關鍵時刻最可靠。'
+                    },
+                    'ISFP': {
+                        title: '藝術裝飾師',
+                        titleEn: 'Artistic Decorator',
+                        description: '你是聚會的美感創造者。喜歡用鮮花、擺飾讓環境更美，或用美食和音樂營造氛圍。你的藝術天份讓過年更有質感。'
+                    },
+                    'ESTP': {
+                        title: '遊戲主持人',
+                        titleEn: 'Game Master',
+                        description: '你是聚會的活力引擎！擅長帶動氣氛，提議各種好玩的活動。你的行動力和幽默感讓過年永遠不無聊。'
+                    },
+                    'ESFP': {
+                        title: '表演者',
+                        titleEn: 'Entertainer',
+                        description: '你是聚會的焦點明星！愛表演、愛搞笑，總能逗大家開心。你的熱情和表現力讓過年充滿歡笑和回憶。'
+                    }
+                },
+
+                startQuiz() {
+                    this.screen = 'quiz';
+                    this.showTutorial = true;
+                    // 延遲一點點，等待畫面切換完成再 scroll
+                    setTimeout(() => {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }, 100);
+                },
+
+                closeTutorial() {
+                    this.showTutorial = false;
+                    // 關閉 tutorial 後，立即 scroll 到頂部
+                    setTimeout(() => {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }, 100);
+                },
+
+                startSwipe(e, index) {
+                    if (this.animating || index !== this.currentQuestion) return;
+
+                    // 阻止預設的捲動行為
+                    if (e.type.includes('touch')) {
+                        e.preventDefault();
+                    }
+
+                    const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                    const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+
+                    this.swipeState = {
+                        swiping: true,
+                        startX: clientX,
+                        startY: clientY,
+                        deltaX: 0,
+                        deltaY: 0,
+                        rotation: 0
+                    };
+
+                    const moveHandler = (e) => this.moveSwipe(e);
+                    const endHandler = (e) => this.endSwipe(e, moveHandler, endHandler);
+
+                    if (e.type.includes('mouse')) {
+                        document.addEventListener('mousemove', moveHandler);
+                        document.addEventListener('mouseup', endHandler);
+                    } else {
+                        document.addEventListener('touchmove', moveHandler);
+                        document.addEventListener('touchend', endHandler);
+                    }
+                },
+
+                moveSwipe(e) {
+                    if (!this.swipeState.swiping) return;
+
+                    // 阻止預設的捲動行為
+                    if (e.type.includes('touch')) {
+                        e.preventDefault();
+                    }
+
+                    const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                    const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+
+                    this.swipeState.deltaX = clientX - this.swipeState.startX;
+                    this.swipeState.deltaY = clientY - this.swipeState.startY;
+                    this.swipeState.rotation = this.swipeState.deltaX / 20;
+                },
+
+                endSwipe(e, moveHandler, endHandler) {
+                    if (e.type.includes('mouse')) {
+                        document.removeEventListener('mousemove', moveHandler);
+                        document.removeEventListener('mouseup', endHandler);
+                    } else {
+                        document.removeEventListener('touchmove', moveHandler);
+                        document.removeEventListener('touchend', endHandler);
+                    }
+
+                    if (!this.swipeState.swiping) return;
+
+                    const threshold = 100;
+
+                    if (this.swipeState.deltaX < -threshold) {
+                        this.swipeLeft();
+                    } else if (this.swipeState.deltaX > threshold) {
+                        this.swipeRight();
+                    } else {
+                        // Reset position
+                        this.swipeState = {
+                            swiping: false,
+                            startX: 0,
+                            startY: 0,
+                            deltaX: 0,
+                            deltaY: 0,
+                            rotation: 0
+                        };
+                    }
+                },
+
+                swipeLeft() {
+                    if (this.animating) return;
+
+                    this.animating = true;
+                    this.answers[this.currentQuestion] = 'A';
+
+                    const card = document.getElementById(`card-${this.currentQuestion}`);
+                    card.classList.add('swiped-left');
+
+                    setTimeout(() => {
+                        this.nextQuestionAfterSwipe();
+                    }, 500);
+                },
+
+                swipeRight() {
+                    if (this.animating) return;
+
+                    this.animating = true;
+                    this.answers[this.currentQuestion] = 'B';
+
+                    const card = document.getElementById(`card-${this.currentQuestion}`);
+                    card.classList.add('swiped-right');
+
+                    setTimeout(() => {
+                        this.nextQuestionAfterSwipe();
+                    }, 500);
+                },
+
+                nextQuestionAfterSwipe() {
+                    // 清除前一張卡片的動畫 class
+                    const prevCard = document.getElementById(`card-${this.currentQuestion}`);
+                    if (prevCard) {
+                        prevCard.classList.remove('swiped-left', 'swiped-right');
+                    }
+
+                    if (this.currentQuestion < 15) {
+                        this.currentQuestion++;
+                        this.animating = false;
+                        this.swipeState = {
+                            swiping: false,
+                            startX: 0,
+                            startY: 0,
+                            deltaX: 0,
+                            deltaY: 0,
+                            rotation: 0
+                        };
+                    } else {
+                        this.calculateResult();
+                    }
+                },
+
+                prevQuestion() {
+                    if (this.currentQuestion > 0 && !this.animating) {
+                        this.currentQuestion--;
+                    }
+                },
+
+                calculateResult() {
+                    // 計算各維度分數
+                    let scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+
+                    this.answers.forEach((answer, index) => {
+                        const dimension = this.questions[index].dimension;
+                        if (answer === 'A') {
+                            scores[dimension[0]]++;
+                        } else if (answer === 'B') {
+                            scores[dimension[1]]++;
+                        }
+                    });
+
+                    // 決定 MBTI 類型
+                    const type =
+                        (scores.E >= scores.I ? 'E' : 'I') +
+                        (scores.S >= scores.N ? 'S' : 'N') +
+                        (scores.T >= scores.F ? 'T' : 'F') +
+                        (scores.J >= scores.P ? 'J' : 'P');
+
+                    const typeInfo = this.mbtiTypes[type];
+                    this.result = {
+                        type: type,
+                        title: typeInfo.title,
+                        titleEn: typeInfo.titleEn,
+                        description: typeInfo.description,
+                        image: `/images/${type.toLowerCase()}-share.png`
+                    };
+
+                    this.screen = 'result';
+                    this.animating = false;
+                    this.updateMetaTags();
+                },
+
+                share() {
+                    const shareUrl = `${window.location.origin}/result/${this.result.type}`;
+                    const shareData = {
+                        title: `我的 MBTI 人格是 ${this.result.type} - ${this.result.title}`,
+                        text: `我的 MBTI 人格是 ${this.result.type} - ${this.result.title}！你也來測測看～`,
+                        url: shareUrl
+                    };
+
+                    if (navigator.share) {
+                        navigator.share(shareData).catch(err => {
+                            console.log('分享失敗:', err);
+                        });
+                    } else {
+                        // 如果不支援 Web Share API，複製連結
+                        navigator.clipboard.writeText(shareUrl).then(() => {
+                            alert('連結已複製到剪貼簿！');
+                        });
+                    }
+                },
+
+                updateMetaTags() {
+                    if (!this.result) return;
+
+                    const shareUrl = `${window.location.origin}/result/${this.result.type}`;
+                    const imageUrl = `${window.location.origin}${this.result.image}`;
+                    const title = `我的 MBTI 人格是 ${this.result.type} - ${this.result.title}`;
+                    const description = this.result.description;
+
+                    // 更新瀏覽器網址列
+                    history.pushState({}, '', shareUrl);
+
+                    // 更新 meta tags
+                    document.getElementById('page-title').textContent = title;
+                    document.getElementById('og-title').setAttribute('content', title);
+                    document.getElementById('og-description').setAttribute('content', description);
+                    document.getElementById('og-image').setAttribute('content', imageUrl);
+                    document.getElementById('og-url').setAttribute('content', shareUrl);
+                },
+
+                restart() {
+                    this.screen = 'start';
+                    this.currentQuestion = 0;
+                    this.answers = Array(16).fill(null);
+                    this.result = null;
+                    this.animating = false;
+                }
+            }
+        }
+    </script>
+
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+    <script defer
+        src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
+        integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ=="
+        data-cf-beacon='{"version":"2024.11.0","token":"3a5d911409f3432391e1c57a37d99e87","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}'
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
